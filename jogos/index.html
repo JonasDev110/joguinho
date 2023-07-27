@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Jogo da Velha</title>
+  <style>
+    body {
+      font-family: "Oxanium", cursive;
+      background: linear-gradient(90deg, rgba(65, 185 ,131, 1)0%, rgba(0, 212, 255, 1)100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    #board {
+      border-collapse: collapse;
+    }
+    #board td {
+      width: 100px;
+      height: 100px;
+      border: 2px solid #000;
+      text-align: center;
+      font-size: 48px;
+    }
+    #status {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    #restartButton {
+        color: #000;
+        background-color: gold;
+      font-size: 18px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Jogo da Velha</h1>
+  <p id="status">Vez do jogador "X"</p>
+  <table id="board">
+    <tr>
+      <td onclick="placeMark(0, 0)"></td>
+      <td onclick="placeMark(0, 1)"></td>
+      <td onclick="placeMark(0, 2)"></td>
+    </tr>
+    <tr>
+      <td onclick="placeMark(1, 0)"></td>
+      <td onclick="placeMark(1, 1)"></td>
+      <td onclick="placeMark(1, 2)"></td>
+    </tr>
+    <tr>
+      <td onclick="placeMark(2, 0)"></td>
+      <td onclick="placeMark(2, 1)"></td>
+      <td onclick="placeMark(2, 2)"></td>
+    </tr>
+  </table>
+  <button id="restartButton" onclick="restartGame()">Reiniciar Jogo</button>
+
+  <script>
+    let board = [
+      ['', '', ''],
+      ['', '', ''],
+      ['', '', '']
+    ];
+
+    let currentPlayer = 'X';
+    let isGameOver = false;
+
+    function checkWinner() {
+      const winPatterns = [
+        [[0, 0], [0, 1], [0, 2]],
+        [[1, 0], [1, 1], [1, 2]],
+        [[2, 0], [2, 1], [2, 2]],
+        [[0, 0], [1, 0], [2, 0]],
+        [[0, 1], [1, 1], [2, 1]],
+        [[0, 2], [1, 2], [2, 2]],
+        [[0, 0], [1, 1], [2, 2]],
+        [[0, 2], [1, 1], [2, 0]]
+      ];
+
+      for (const pattern of winPatterns) {
+        const [a, b, c] = pattern;
+        if (
+          board[a[0]][a[1]] &&
+          board[a[0]][a[1]] === board[b[0]][b[1]] &&
+          board[a[0]][a[1]] === board[c[0]][c[1]]
+        ) {
+          return board[a[0]][a[1]];
+        }
+      }
+
+      if (board.flat().every(cell => cell !== '')) {
+        return 'T';
+      }
+
+      return null;
+    }
+
+    function placeMark(row, col) {
+      if (isGameOver || board[row][col] !== '') return;
+
+      board[row][col] = currentPlayer;
+      document.getElementById('board').rows[row].cells[col].innerText = currentPlayer;
+
+      const winner = checkWinner();
+      if (winner) {
+        isGameOver = true;
+        let statusText = '';
+        if (winner === 'T') {
+          statusText = "Empate!";
+        } else {
+          statusText = `O jogador "${winner}" venceu!`;
+        }
+        document.getElementById('status').innerText = statusText;
+      } else {
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        document.getElementById('status').innerText = `Vez do jogador "${currentPlayer}"`;
+      }
+    }
+
+    function restartGame() {
+      board = [
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', '']
+      ];
+      currentPlayer = 'X';
+      isGameOver = false;
+
+      const cells = document.getElementById('board').getElementsByTagName('td');
+      for (const cell of cells) {
+        cell.innerText = '';
+      }
+
+      document.getElementById('status').innerText = `Vez do jogador "${currentPlayer}"`;
+    }
+  </script>
+</body>
+</html>
